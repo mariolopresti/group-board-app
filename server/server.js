@@ -19,10 +19,10 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 const db = mysql.createConnection({
-  host: process.env.MYSQL_HOST,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
+  host: 'sql7.freesqldatabase.com',
+  user: 'sql7797118',
+  password: "JTyXh6qzXg",
+  database: 'sql7797118',
 })
 
 // all activities
