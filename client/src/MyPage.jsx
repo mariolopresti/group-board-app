@@ -55,7 +55,7 @@ const MyPage = () => {
         options.forEach((option, index) => {
           newEntry[option] = entry[option];
         })
-        newEntry.hours = 0; // Inizializza le ore
+        newEntry.hours = 0;
         acc[key_acc] = newEntry;
       }
       // Somma le ore alla combinazione di chiave esistente
@@ -101,7 +101,7 @@ const MyPage = () => {
         }
         setThirdButtonDisabled(true)
         return
-      case 'secondOption': // Se è il primo select
+      case 'secondOption':
         setSelectedSecondOption(value);
         setSelectedThirdOption("noGrouping")
         if (value === "noGrouping") {
@@ -109,7 +109,7 @@ const MyPage = () => {
         } else
           setThirdButtonDisabled(false)
         return;
-      case 'thirdOption': // Se è il primo select
+      case 'thirdOption':
         setSelectedThirdOption(value);
         return;
     }
@@ -133,7 +133,7 @@ const MyPage = () => {
                   </option>
                 ))}
               </select>
-              <label htmlFor="floatingSelectGrid">Seleziona il tipo di raggrupamento</label>
+              <label htmlFor="floatingSelectGrid">Seleziona il tipo di raggruppamento</label>
             </div>
           </div>
           <div className="col-md">
@@ -152,7 +152,7 @@ const MyPage = () => {
                   </option>
                 ))}
               </select>
-              <label htmlFor="floatingSelectGrid">Seleziona il tipo di raggrupamento secondo livelllo</label>
+              <label htmlFor="floatingSelectGrid">Seleziona il tipo di raggruppamento secondo livello</label>
             </div>
           </div>
           <div className="col-md">
@@ -171,7 +171,7 @@ const MyPage = () => {
                   </option>
                 ))}
               </select>
-              <label htmlFor="floatingSelectGrid">Seleziona il tipo di raggrupamento secondo livelllo</label>
+              <label htmlFor="floatingSelectGrid">Seleziona il tipo di raggruppamento terzo livello</label>
             </div>
           </div>
 
