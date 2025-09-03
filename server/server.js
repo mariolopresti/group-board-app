@@ -1,11 +1,13 @@
 import express, {json} from 'express';
 import mysql from 'mysql';
 import cors from 'cors';
+import dotenv from 'dotenv';
 
 
 const app = express();
 
 app.use(express.json());
+dotenv.config(); // Carica le variabili da .env
 
 const corsOptions = {
   origin: '*',
@@ -17,10 +19,10 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 const db = mysql.createConnection({
-  host: 'sql7.freesqldatabase.com',
-  user: 'sql7797118',
-  password: "JTyXh6qzXg",
-  database: 'sql7797118',
+  host: process.env.MYSQL_HOST,
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE,
 })
 
 // all activities
