@@ -6,3 +6,33 @@
   text-align: center;
   align-self: start;
 }
+
+body {
+  margin: 0;
+  background-color: white;
+  color: #1a1a1a;
+}
+
+table {
+  margin-top: 100px;
+}
+.selector-container{
+  margin-top: 50px;
+
+}
+
+@media (max-width: 600px) {
+  body {
+    width: 100vw;
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+  }
+
+  table {
+    margin-top: 30px;
+    width: 100%;
+    border-collapse: collapse;
+  }
+}

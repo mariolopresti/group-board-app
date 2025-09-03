@@ -1,7 +1,8 @@
 import './App.css'
 import {BrowserRouter, Route, Routes} from "react-router-dom";
-import MyPage from "./MyPage.jsx";
+import React from 'react';
 
+import MyPage from "./MyPage.jsx";
 
 function App() {
 
@@ -12,7 +13,6 @@ function App() {
           <Route path="/" element={ <MyPage />} />
         </Routes>
       </BrowserRouter>
-
     </>
   )
 }

@@ -9,10 +9,9 @@ const MyPage = () => {
   const groupByOptions = [
     {value: 'noGrouping', label: 'Nessuno'},
     {value: 'project_name', label: 'Progetto'},
-    {value: 'employ_name', label: 'Lavoratore'},
+    {value: 'employ_name', label: 'Dipendente'},
     {value: 'date', label: 'Data'}
   ];
-
 
   const [secondButtonDisabled, setSecondButtonDisabled] = useState(true);
   const [thirdButtonDisabled, setThirdButtonDisabled] = useState(true);
@@ -29,7 +28,7 @@ const MyPage = () => {
 
   const load = async () => {
     try {
-      const response = await axios.get("http://localhost:3040/api/all");
+      const response = await axios.get("http://localhost:3040/api/activities");
       const data = response.data.map(el =>
         ({...el, date: new Date(el.date).toLocaleDateString('it-IT')}))
 
@@ -44,128 +43,90 @@ const MyPage = () => {
     setArrayDataGrouped(arrayData);
   }
 
-  const groupData = async (key) => {
-    if (key === 'noGrouping') {
-      return fetchAll()
+  const extracted = (options) => {
+    const result = arrayData.reduce((acc, entry) => {
+
+      const keyParts = options.map(option => entry[option]); // Array di valori per ogni opzione
+      const key_acc = keyParts.join('_'); // Unisce i valori per creare una chiave unica
+
+      // Se la combinazione non esiste nell'accumulatore, la inizializziamo
+      if (!acc[key_acc]) {
+        const newEntry = {};
+        options.forEach((option, index) => {
+          newEntry[option] = entry[option];
+        })
+        newEntry.hours = 0; // Inizializza le ore
+        acc[key_acc] = newEntry;
+      }
+      // Somma le ore alla combinazione di chiave esistente
+      acc[key_acc].hours += entry.hours;
+      return acc;
+    }, {});
+
+    return result;
+  }
+
+  const groupData = async (options) => {
+    if (options.length == 1) {
+      if (options.includes('noGrouping')) {
+        return fetchAll()
+      }
+      const groupByOptionsUpdated = groupByOptions.filter(filter => !options.includes(filter.value));
+      setSecondGroupByOptions(groupByOptionsUpdated)
     }
-
-    const groupByOptionsUpdated = groupByOptions.filter(filter => filter.value !== key);
-    setSecondGroupByOptions(groupByOptionsUpdated)
-
-    const result = arrayData.reduce((acc, entry) => {
-      const entryName = entry[key];
-      // Se il nome del progetto non esiste nell'acc, creiamo un nuovo oggetto
-      if (!acc[entryName]) {
-        acc[entryName] = {[key]: entryName, hours: 0};
-      }
-      acc[entryName].hours += entry.hours;
-      return acc;
-    }, {});
-
+    if (options.length == 2) {
+      const groupByOptionsUpdated = !options.includes('noGrouping') ? secondGroupByOptions.filter(filter => !options.includes(filter.value)) : secondGroupByOptions;
+      setThirdGroupByOptions(groupByOptionsUpdated)
+    }
+    const result = extracted(options);
     setArrayDataGrouped(Object.values(result));
   }
-
-
-  const groupDataTwoFilters = async (key) => {
-    const groupByOptionsUpdated = key != 'noGrouping' ? secondGroupByOptions.filter(filter => filter.value !== key) : secondGroupByOptions;
-    setThirdGroupByOptions(groupByOptionsUpdated)
-    const result = arrayData.reduce((acc, entry) => {
-      const firstOption = entry[selectedFirstOption];
-      const secondOption = entry[key];
-
-      // Creiamo una chiave unica combinando project_name ed employ_name
-      const key_project_employ = `${firstOption}_${secondOption}`;
-
-      // Se la combinazione non esiste nell'accumulatore, la inizializziamo
-      if (!acc[key_project_employ]) {
-        acc[key_project_employ] = {[selectedFirstOption]: firstOption, [key]: secondOption, hours: 0};
-      }
-      acc[key_project_employ].hours += entry.hours;
-
-      return acc;
-    }, {});
-
-    setArrayDataGrouped(Object.values(result));
-    console.log("result proj e ", (Object.values(result)))
-  }
-
-  const groupDataThirdFilters = async (key) => {
-    const result = arrayData.reduce((acc, entry) => {
-      const firstOption = entry[selectedFirstOption];
-      const secondOption = entry[selectedSecondOption];
-      const thirdOption = entry[key];
-
-      // Creiamo una chiave unica combinando project_name ed employ_name
-      const key_project_employ = `${firstOption}_${secondOption}_${thirdOption}`;
-
-      // Se la combinazione non esiste nell'accumulatore, la inizializziamo
-      if (!acc[key_project_employ]) {
-        acc[key_project_employ] = {
-          [selectedFirstOption]: firstOption,
-          [selectedSecondOption]: secondOption,
-          [key]: thirdOption,
-          hours: 0
-        };
-      }
-
-      acc[key_project_employ].hours += entry.hours;
-
-      return acc;
-    }, {});
-
-    setArrayDataGrouped(Object.values(result));
-  }
-
-
 
   useEffect(() => {
     load();
   }, [])
 
+  const handleSelectChange = (event) => {
+    const { value, name } = event.target;
 
-  const handleSelectChange1 = (event) => {
-    const valueSelected = event.target.value
-    setSelectedFirstOption(valueSelected);
-    setSelectedSecondOption("noGrouping")
-    setSelectedThirdOption("noGrouping")
-    if (valueSelected === "noGrouping") {
-      setSecondButtonDisabled(true)
-
-    } else {
-      setSecondButtonDisabled(false)
-
+    switch (name) {
+      case 'firstOption':
+        setSelectedFirstOption(value);
+        setSelectedSecondOption("noGrouping")
+        setSelectedThirdOption("noGrouping")
+        if (value === "noGrouping") {
+          setSecondButtonDisabled(true)
+        } else {
+          setSecondButtonDisabled(false)
+        }
+        setThirdButtonDisabled(true)
+        return
+      case 'secondOption': // Se è il primo select
+        setSelectedSecondOption(value);
+        setSelectedThirdOption("noGrouping")
+        if (value === "noGrouping") {
+          setThirdButtonDisabled(true)
+        } else
+          setThirdButtonDisabled(false)
+        return;
+      case 'thirdOption': // Se è il primo select
+        setSelectedThirdOption(value);
+        return;
     }
-    setThirdButtonDisabled(true)
-
   };
-
-  const handleSelectChange2 = (event) => {
-    const valueSelected = event.target.value
-
-    setSelectedSecondOption(event.target.value);
-    setSelectedThirdOption("noGrouping")
-
-    if (valueSelected === "noGrouping") {
-      setThirdButtonDisabled(true)
-
-    } else
-      setThirdButtonDisabled(false)
-  };
-
-  const handleSelectChange3 = (event) => {
-    setSelectedThirdOption(event.target.value);
-  };
-
 
   return (
     <>
-      <div>
-        <div className="row g-2">
+      <div className="selector-container">
+        <div className="row g-4">
           <div className="col-md">
-            <div className="form-floating" onChange={(e) => groupData(e.target.value)}>
-              <select className="form-select" id="floatingSelectGrid"
+            <div className="form-floating">
+              <select className="form-select" id="floatingSelectGrid" name="firstOption"
                       value={selectedFirstOption}
-                      onChange={handleSelectChange1}>
+                      onChange={(e) => {
+                        handleSelectChange(e);
+                        groupData([e.target.value]);
+                      }}>
                 {groupByOptions.map((filter) => (
                   <option key={filter.value} value={filter.value}>
                     {filter.label}
@@ -176,11 +137,13 @@ const MyPage = () => {
             </div>
           </div>
           <div className="col-md">
-            <div className="form-floating"
-                 onChange={(e) => groupDataTwoFilters(e.target.value)}>
-              <select className="form-select" id="floatingSelectGrid"
+            <div className="form-floating" >
+              <select className="form-select" id="floatingSelectGrid" name="secondOption"
                       value={selectedSecondOption}
-                      onChange={handleSelectChange2}
+                      onChange={(e) => {
+                        handleSelectChange(e);
+                        groupData([selectedFirstOption, e.target.value]);
+                      }}
                       disabled={secondButtonDisabled}
               >
                 {secondGroupByOptions.map((filter) => (
@@ -193,12 +156,13 @@ const MyPage = () => {
             </div>
           </div>
           <div className="col-md">
-            <div className="form-floating"
-                 onChange={(e) => groupDataThirdFilters(e.target.value)}
-            >
-              <select className="form-select" id="floatingSelectGrid"
+            <div className="form-floating">
+              <select className="form-select" id="floatingSelectGrid" name="thirdOption"
                       value={selectedThirdOption}
-                      onChange={handleSelectChange3}
+                      onChange={(e) => {
+                        handleSelectChange(e);
+                        groupData([selectedFirstOption, selectedSecondOption, e.target.value]);
+                      }}
                       disabled={thirdButtonDisabled}
               >
                 {thirdGroupOptions.map((filter) => (
@@ -213,12 +177,11 @@ const MyPage = () => {
 
         </div>
       </div>
-      <div>
+      <div className="table-wrapper">
         <MyTable data={arrayDataGrouped}/>
       </div>
     </>
   )
 }
-
 
 export default MyPage;
