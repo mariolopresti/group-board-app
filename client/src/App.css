@@ -16,9 +16,9 @@ body {
 table {
   margin-top: 100px;
 }
-.selector-container{
-  margin-top: 50px;
 
+.selector-container, .no-data {
+  margin-top: 50px;
 }
 
 @media (max-width: 600px) {

@@ -178,7 +178,9 @@ const MyPage = () => {
         </div>
       </div>
       <div className="table-wrapper">
-        <MyTable data={arrayDataGrouped}/>
+        {arrayDataGrouped.length != 0 ? <MyTable data={arrayDataGrouped}/> :
+          <div className="no-data">No Data load</div>
+        }
       </div>
     </>
   )
